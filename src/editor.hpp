@@ -3,18 +3,9 @@
 
 #include "buffer.hpp"
 #include "caret.hpp"
-#include "undo.hpp"
 #include <wx/wx.h>
 #include <wx/dcbuffer.h>
 #include <string>
-
-struct SelectionRange
-{
-    CaretPosition start;
-    CaretPosition end;
-
-    SelectionRange(CaretPosition start, CaretPosition end);
-};
 
 class EditorCtrl : public wxWindow
 {
@@ -26,7 +17,6 @@ private:
     wxSize charSize;
     TextBuffer buffer;
     CaretPosition caretPos;
-    UndoManager undo;
 
     bool dragging;
     CaretPosition selectionAnchor;
@@ -46,15 +36,13 @@ private:
     void NormalizeCaret();
 
     bool HasSelection();
-    SelectionRange GetSelectionRange();
+    CaretPositionRange GetSelectionRange();
     void InvalidateSelection();
     void DeleteSelection();
     void SelectAll();
     std::wstring GetSelectionText();
     void CopySelection();
     void Paste();
-
-    void RecordUndo();
 
     void InsertNewline();
     void DeleteForward();

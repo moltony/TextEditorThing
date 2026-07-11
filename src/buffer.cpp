@@ -132,6 +132,11 @@ void TextBuffer::RemoveRange(int startLine, int startColumn, int endLine, int en
     }
 }
 
+void TextBuffer::RemoveRange(CaretPositionRange range)
+{
+    RemoveRange(range.start.line, range.start.column, range.end.line, range.end.column);
+}
+
 void TextBuffer::MergeNext(int index)
 {
     if (index >= lines.size() - 1)

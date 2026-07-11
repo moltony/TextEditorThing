@@ -33,3 +33,18 @@ CaretPosition &CaretPosition::operator=(const CaretPosition &other)
     return *this;
 }
 
+CaretPositionRange::CaretPositionRange()
+{
+}
+
+CaretPositionRange::CaretPositionRange(CaretPosition start, CaretPosition end)
+{
+    this->start = start;
+    this->end = end;
+}
+
+CaretPositionRange::CaretPositionRange(CaretPosition caretPos)
+{
+    start = caretPos;
+    end = caretPos;
+}

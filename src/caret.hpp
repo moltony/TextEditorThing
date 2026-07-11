@@ -14,4 +14,14 @@ struct CaretPosition
     CaretPosition &operator=(const CaretPosition &);
 };
 
+struct CaretPositionRange
+{
+    CaretPosition start;
+    CaretPosition end;
+
+    CaretPositionRange();
+    CaretPositionRange(CaretPosition start, CaretPosition end);
+    CaretPositionRange(CaretPosition caretPos);
+};
+
 #endif

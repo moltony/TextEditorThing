@@ -1,6 +1,7 @@
 #ifndef BUFFER_HPP
 #define BUFFER_HPP
 
+#include "caret.hpp"
 #include <vector>
 #include <string>
 
@@ -19,6 +20,7 @@ public:
     void InsertLine(int index);
     void RemoveLine(int index);
     void RemoveRange(int startLine, int startColumn, int endLine, int endColumn);
+    void RemoveRange(CaretPositionRange range);
     void MergeNext(int index);
     std::wstring GetLine(int index);
     std::wstring GetRange(int startLine, int startColumn, int endLine, int endColumn);

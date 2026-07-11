@@ -4,18 +4,6 @@
 #include <wx/dcbuffer.h>
 #include <wx/clipbrd.h>
 
-// ==================================================
-// SelectionRange
-// ==================================================
-
-SelectionRange::SelectionRange(CaretPosition start, CaretPosition end)
-{
-    this->start = start;
-    this->end = end;
-}
-
-// ==================================================
-
 EditorCtrl::EditorCtrl(wxWindow *parent) : wxWindow(parent, wxID_ANY)
 {
     SetBackgroundStyle(wxBG_STYLE_PAINT);
@@ -66,7 +54,6 @@ void EditorCtrl::OnChar(wxKeyEvent &event)
     wxChar ch = event.GetUnicodeKey();
     if (ch != WXK_NONE) {
         if (ch >= 32) {
-            RecordUndo();
             if (HasSelection()) {
                 DeleteSelection();
                 NormalizeCaret();
@@ -116,7 +103,6 @@ void EditorCtrl::OnKeyDown(wxKeyEvent &event)
         break;
     case 'X':
         if (ctrl) {
-            RecordUndo();
             CopySelection();
             DeleteSelection();
         } else {
@@ -125,7 +111,6 @@ void EditorCtrl::OnKeyDown(wxKeyEvent &event)
         break;
     case 'V':
         if (ctrl) {
-            RecordUndo();
             DeleteSelection();
             Paste();
         } else {
@@ -135,9 +120,9 @@ void EditorCtrl::OnKeyDown(wxKeyEvent &event)
     case 'Z':
         if (ctrl) {
             if (shift) {
-                undo.Redo(buffer, caretPos);
+                //
             } else {
-                undo.Undo(buffer, caretPos);
+                //
             }
             InvalidateSelection();
             Refresh();
@@ -147,7 +132,7 @@ void EditorCtrl::OnKeyDown(wxKeyEvent &event)
         break;
     case 'Y':
         if (ctrl) {
-            undo.Redo(buffer, caretPos);
+            //
             InvalidateSelection();
             Refresh();
         } else {
@@ -155,15 +140,12 @@ void EditorCtrl::OnKeyDown(wxKeyEvent &event)
         }
         break;
     case WXK_RETURN:
-        RecordUndo();
         InsertNewline();
         break;
     case WXK_DELETE:
-        RecordUndo();
         DeleteForward();
         break;
     case WXK_BACK:
-        RecordUndo();
         DeleteBackward();
         break;
     case WXK_HOME:
@@ -224,7 +206,7 @@ void EditorCtrl::RenderCaret(wxDC &dc)
 
 void EditorCtrl::RenderSelection(wxDC &dc, int line)
 {
-    SelectionRange range = GetSelectionRange();
+    CaretPositionRange range = GetSelectionRange();
 
     if (!HasSelection() || line < range.start.line || line > range.end.line) {
         return;
@@ -295,9 +277,9 @@ bool EditorCtrl::HasSelection()
     return selectionAnchor.line != -1 && caretPos != selectionAnchor;
 }
 
-SelectionRange EditorCtrl::GetSelectionRange()
+CaretPositionRange EditorCtrl::GetSelectionRange()
 {
-    return SelectionRange(std::min(caretPos, selectionAnchor), std::max(caretPos, selectionAnchor));
+    return CaretPositionRange(std::min(caretPos, selectionAnchor), std::max(caretPos, selectionAnchor));
 }
 
 void EditorCtrl::InvalidateSelection()
@@ -310,8 +292,8 @@ void EditorCtrl::DeleteSelection()
     if (!HasSelection())
         return;
 
-    SelectionRange range = GetSelectionRange();
-    buffer.RemoveRange(range.start.line, range.start.column, range.end.line, range.end.column);
+    CaretPositionRange range = GetSelectionRange();
+    buffer.RemoveRange(range);
     MoveCaret(range.start.line, range.start.column);
     InvalidateSelection();
 }
@@ -324,7 +306,7 @@ void EditorCtrl::SelectAll()
 
 std::wstring EditorCtrl::GetSelectionText()
 {
-    SelectionRange range = GetSelectionRange();
+    CaretPositionRange range = GetSelectionRange();
     return buffer.GetRange(range.start.line, range.start.column, range.end.line, range.end.column);
 }
 
@@ -349,13 +331,6 @@ void EditorCtrl::Paste()
         }
         wxTheClipboard->Close();
     }
-}
-
-// ==================================================
-
-void EditorCtrl::RecordUndo()
-{
-    undo.Record(buffer, caretPos);
 }
 
 // ==================================================
